@@ -1,0 +1,144 @@
+﻿<!-- GetUnicode by Omid K. Rad, August 2005 -->
+<!-- Version: 2.0 -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>GetUnicode</title>
+		<meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
+		<style type="text/css">
+			#Representation	{
+				FONT-FAMILY: Tahoma;
+				FONT-SIZE: 10pt;
+				BORDER-WIDTH: 2px;
+				BORDER-STYLE: inset;
+				WIDTH: 485px;
+				MARGIN-RIGHT: 4px;
+			}
+		</style>
+		<script language="javascript" type="text/javascript" defer>
+			function UnicodeEncoding(str, encodeAscii) {
+				var unicodeHex = "<";
+				var unicodeJScriptLiteral = "\"";
+				var unicodeXmlHex = "";
+				var unicodeXmlDec = "";
+				var unicodeUri = "";
+				for (i = 0; i < str.length; i++) {
+					code = str.charCodeAt(i);
+					c = str.charAt(i)
+					unicodeHex += "U+" + getHex(code, true, true);
+					if (i < str.length - 1)
+						unicodeHex += ", ";
+					if (code > 127 || encodeAscii) {
+						unicodeJSLiteral += "\\u" + getHex(code, true, false);
+						unicodeXmlHex += "&#x" + getHex(code, false, false) + ";";
+						unicodeXmlDec += "&#" + code + ";";
+						unicodeUri += (code > 127) ? encodeURI(c) : "%" + getHex(code, false, false);
+					}
+					else {
+						unicodeJSLiteral += c;
+						unicodeXmlHex += c;
+						unicodeXmlDec += c;
+						unicodeUri += (code == 0x20) ? "%20" : c;
+					}
+				}
+				unicodeHex += ">";
+				unicodeJSLiteral += "\"";
+				this.UnicodeHex = unicodeHex;
+				this.UnicodeJSLiteral = unicodeJSLiteral;
+				this.UnicodeXmlHex = unicodeXmlHex;
+				this.UnicodeXmlDec = unicodeXmlDec;
+				this.UnicodeUri = unicodeUri;
+			}
+			
+			function getHex(num, addLeadingZeros, useUpperCase) {
+				size = 4;
+				hex = num.toString(16);
+				if (useUpperCase)
+					hex = hex.toUpperCase();
+				if (addLeadingZeros)
+					if (0 < (r = size - hex.length))
+						for (j = 0; j < r; j++)
+							hex = "0" + hex;
+				return hex;
+			}
+			
+			function showUnicode(str) {
+				try {
+					str = eval(str).toString();
+				}
+				catch(ex) {
+					str = decodeURI(str);
+				}
+				if (str == null || str == "undefined")
+					str = "";
+				else
+				if (str.indexOf("<")==0 && str.lastIndexOf(">")==str.length-1) {
+					str = str.toUpperCase()
+					.replace(/\s+/g,"")
+					.replace("<U+", "&#x")
+					.replace(/(,U\+)/g, ";&#x")
+					.replace(">", ";");
+				}
+				Representation.innerHTML = str;
+				str = Representation.innerText;
+
+				var enc = new UnicodeEncoding(str, EncodeAscii.checked);
+				UnicodeHexText.value = enc.UnicodeHex;
+				JSLiteral.value = enc.UnicodeJSLiteral;
+				UnicodeXMLHexText.value = enc.UnicodeXmlHex;
+				UnicodeXMLDecText.value = enc.UnicodeXmlDec;
+				URIEncText.value = enc.UnicodeUri;
+			}
+			
+			function changeDirection() {
+				if (Representation.dir == "ltr") {
+					Representation.dir = "rtl";
+					dirButton.value = "\u25BA"; // ->
+				}
+				else {
+					Representation.dir = "ltr";
+					dirButton.value = "\u25C4"; // <-
+				}
+			}
+			
+			function copyToClipboard(text) {
+				window.clipboardData.setData("Text", text);
+			}
+		</script>
+	</head>
+	<body>
+		<h3>Get Unicode</h3>
+		<b>Enter a Unicode string or a JavaScript expression that evaluates to a string in the field below and press Go.</b><br><br>
+		<input type="checkbox" id="EncodeAscii">Encode ASCII characters<br><br>
+		Unicode, HTML, URI, or JavaScript string:<br>
+		<input type="text" id="inputField" size="75" onkeyup="goButton.click()">
+		<input type="button" id="goButton" value="Go" onclick="showUnicode(inputField.value)">
+		<br><br>
+		Representation:<br>
+		<span id="Representation" dir="ltr" contenteditable></span>
+		<input type="button" value="Copy" onclick="copyToClipboard(Representation.innerText);">
+		<input type="button" id="dirButton" value="&#x25C4;" onclick="changeDirection()">
+		<br><br>
+		Unicode standard:<br>
+		<input type="text" id="UnicodeHexText" size="75">
+		<input type="button" value="Copy" onclick="copyToClipboard(UnicodeHexText.value);">
+		<br><br>
+		JavaScript literal:<br>
+		<input type="text" id="JSLiteral" size="75">
+		<input type="button" value="Copy" onclick="copyToClipboard(JSLiteral.value);">
+		<br><br>
+		HTML (Hex):<br>
+		<input type="text" id="UnicodeXMLHexText" size="75">
+		<input type="button" value="Copy" onclick="copyToClipboard(UnicodeXMLHexText.value);">
+		<br><br>
+		HTML (Decimal):<br>
+		<input type="text" id="UnicodeXMLDecText" size="75">
+		<input type="button" value="Copy" onclick="copyToClipboard(UnicodeXMLDecText.value);">
+		<br><br>
+		URI encoding:<br>
+		<input type="text" id="URIEncText" size="75">
+		<input type="button" value="Copy" onclick="copyToClipboard(URIEncText.value);">
+	</body>
+</html>
